@@ -1,4 +1,4 @@
-codeigniterHMVC
+Codeigniter HMVC
 ===============
 
 Codeigiter HMVC extension.
