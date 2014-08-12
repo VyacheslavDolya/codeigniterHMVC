@@ -1,40 +1,10 @@
 <?php
-/**
- * @name		CodeIgniter HMVC Modules
- * @author		Jens Segers
- * @link		http://www.jenssegers.be
- * @license		MIT License Copyright (c) 2012 Jens Segers
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * @author hArpanet - 23-Jun-2014
- *
- *      Widget() method added to load Widgets for Template library by Jens Segers
- *
- */
+if (!defined("BASEPATH")) exit("No direct script access allowed");
 
-if (!defined("BASEPATH"))
-    exit("No direct script access allowed");
+include_once 'Module'. EXT;
 
-include_once 'Module'.EXT;
-
-class HMVC_Loader extends CI_Loader {
+class HMVC_Loader extends CI_Loader
+{
 
     /**
      * List of loaded modules
@@ -57,14 +27,21 @@ class HMVC_Loader extends CI_Loader {
      *
      * Add the current module to all paths permanently
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
 
         // Get current module from the router
         $router = & $this->_ci_get_component('router');
+
         if ($router->module) {
             $this->add_module($router->module);
         }
+    }
+
+    public function getCI()
+    {
+        return get_instance();
     }
 
     /**
@@ -75,9 +52,10 @@ class HMVC_Loader extends CI_Loader {
      * @param	string	the uri to the controller
      * @param	array	parameters for the requested method
      * @param	boolean return the result instead of showing it
-     * @return	void
+     * @return void
      */
-    public function controller($uri, $params = array(), $return = FALSE) {
+    public function controller($uri, $params = array(), $return = FALSE)
+    {
         // No valid module detected, add current module to uri
         list($module) = $this->detect_module($uri);
 
@@ -110,13 +88,15 @@ class HMVC_Loader extends CI_Loader {
      * @param	string	the name of the class
      * @param	mixed	the optional parameters
      * @param	string	an optional object name
-     * @return	void
+     * @return void
      */
-    public function library($library = '', $params = NULL, $object_name = NULL) {
+    public function library($library = '', $params = NULL, $object_name = NULL)
+    {
         if (is_array($library)) {
             foreach ($library as $class) {
                 $this->library($class, $params);
             }
+
             return;
         }
 
@@ -150,18 +130,21 @@ class HMVC_Loader extends CI_Loader {
      * @param	string	the name of the class
      * @param	string	name for the model
      * @param	bool	database connection
-     * @return	void
+     * @return void
      */
-    public function model($model, $name = '', $db_conn = FALSE) {
+    public function model($model, $name = '', $db_conn = FALSE)
+    {
         if (is_array($model)) {
             foreach ($model as $babe) {
                 $this->model($babe);
             }
+
             return;
         }
 
         // Detect module
         if (list($module, $class) = $this->detect_module($model)) {
+
             // Module already loaded
             if (in_array($module, $this->_ci_modules)) {
                 return parent::model($class, $name, $db_conn);
@@ -196,9 +179,10 @@ class HMVC_Loader extends CI_Loader {
      * @param	string
      * @param	array
      * @param	bool
-     * @return	void
+     * @return void
      */
-    public function view($view, $vars = array(), $return = FALSE) {
+    public function view($view, $vars = array(), $return = FALSE)
+    {
         // Detect module
         if (list($module, $class) = $this->detect_module($view)) {
             // Module already loaded
@@ -227,9 +211,10 @@ class HMVC_Loader extends CI_Loader {
      * @param	string
      * @param	bool
      * @param 	bool
-     * @return	void
+     * @return void
      */
-    public function config($file = '', $use_sections = FALSE, $fail_gracefully = FALSE) {
+    public function config($file = '', $use_sections = FALSE, $fail_gracefully = FALSE)
+    {
         // Detect module
         if (list($module, $class) = $this->detect_module($file)) {
             // Module already loaded
@@ -258,13 +243,15 @@ class HMVC_Loader extends CI_Loader {
      * This function loads the specified helper file.
      *
      * @param	mixed
-     * @return	void
+     * @return void
      */
-    public function helper($helper = array()) {
+    public function helper($helper = array())
+    {
         if (is_array($helper)) {
             foreach ($helper as $help) {
                 $this->helper($help);
             }
+
             return;
         }
 
@@ -295,13 +282,15 @@ class HMVC_Loader extends CI_Loader {
      *
      * @param	array
      * @param	string
-     * @return	void
+     * @return void
      */
-    public function language($file = array(), $lang = '') {
+    public function language($file = array(), $lang = '')
+    {
         if (is_array($file)) {
             foreach ($file as $langfile) {
                 $this->language($langfile, $lang);
             }
+
             return;
         }
 
@@ -312,21 +301,15 @@ class HMVC_Loader extends CI_Loader {
                 return parent::language($class, $lang);
             }
 
-            // Add module
-            $this->add_module($module);
-
-            // Let parent do the heavy work
-            $void = parent::language($class, $lang);
-
-            // Remove module
-            $this->remove_module();
+            $this->add_module($module); // Add module
+            $void = parent::language($class, $lang); // Let parent do the heavy work
+            $this->remove_module(); // Remove module
 
             return $void;
         } else {
             return parent::language($file, $lang);
         }
     }
-
 
     /**
      * Add Module
@@ -336,7 +319,8 @@ class HMVC_Loader extends CI_Loader {
      * @param	string
      * @param 	boolean
      */
-    public function add_module($module, $view_cascade = TRUE) {
+    public function add_module($module, $view_cascade = TRUE)
+    {
         if ($path = $this->find_module($module)) {
             // Mark module as loaded
             array_unshift($this->_ci_modules, $module);
@@ -354,14 +338,15 @@ class HMVC_Loader extends CI_Loader {
      * @param	type
      * @param 	bool
      */
-    public function remove_module($module = '', $remove_config = TRUE) {
+    public function remove_module($module = '', $remove_config = TRUE)
+    {
         if ($module == '') {
             // Mark module as not loaded
             array_shift($this->_ci_modules);
 
             // Remove package path
             parent::remove_package_path('', $remove_config);
-        } else if (($key = array_search($module, $this->_ci_modules)) !== FALSE) {
+        } elseif (($key = array_search($module, $this->_ci_modules)) !== FALSE) {
             if ($path = $this->find_module($module)) {
                 // Mark module as not loaded
                 unset($this->_ci_modules[$key]);
@@ -380,9 +365,10 @@ class HMVC_Loader extends CI_Loader {
      * @param	string
      * @param	array
      * @param	boolean
-     * @return	object
+     * @return object
      */
-    private function _load_controller($uri = '', $params = array(), $return = FALSE) {
+    private function _load_controller($uri = '', $params = array(), $return = FALSE)
+    {
         $router = & $this->_ci_get_component('router');
 
         // Back up current router values (before loading new controller)
@@ -439,6 +425,7 @@ class HMVC_Loader extends CI_Loader {
         if ($return === TRUE) {
             $buffer = ob_get_contents();
             @ob_end_clean();
+
             return $buffer;
         }
 
@@ -453,10 +440,12 @@ class HMVC_Loader extends CI_Loader {
      * Detects the module from a string. Returns the module name and class if found.
      *
      * @param	string
-     * @return	array|boolean
+     * @return array|boolean
      */
-    private function detect_module($class) {
+    private function detect_module($class)
+    {
         $class = str_replace('.php', '', trim($class, '/'));
+
         if (($first_slash = strpos($class, '/')) !== FALSE) {
             $module = substr($class, 0, $first_slash);
             $class = substr($class, $first_slash + 1);
@@ -473,10 +462,11 @@ class HMVC_Loader extends CI_Loader {
     /**
      * Searches a given module name. Returns the path if found, FALSE otherwise
      *
-     * @param string $module
+     * @param  string         $module
      * @return string|boolean
      */
-    private function find_module($module) {
+    private function find_module($module)
+    {
         $config = & $this->_ci_get_component('config');
 
         // Check all locations for this module
@@ -493,15 +483,15 @@ class HMVC_Loader extends CI_Loader {
     /**
      * Get Module Instance
      *
-     * @param type $moduleName
-     * @return \Module
+     * @param  type              $moduleName
+     * @return Module
      * @throws \RuntimeException
      */
     public function module($moduleName)
     {
         $modulePath = $this->find_module($moduleName);
 
-        if ($modulePath === false ) {
+        if ($modulePath === false) {
             throw new \RuntimeException("could not find module $moduleName");
         }
 

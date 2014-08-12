@@ -36,23 +36,23 @@
 if (!defined("BASEPATH"))
     exit("No direct script access allowed");
 
-class HMVC_Router extends CI_Router {
-
+class HMVC_Router extends CI_Router
+{
     /**
      * Current module name
      *
      * @var string
      * @access public
      */
-    var $module = '';
+    public $module = '';
 
     /**
      * Constructor
      *
      * Runs the route mapping function.
      */
-    function __construct() {
-
+    public function __construct()
+    {
         $this->config =& load_class('Config', 'core');
 
         // Process 'modules_locations' from config
@@ -60,7 +60,7 @@ class HMVC_Router extends CI_Router {
 
         if (!$locations) {
             $locations = array(APPPATH . 'modules/');
-        } else if (!is_array($locations)) {
+        } elseif (!is_array($locations)) {
             $locations = array($locations);
         }
 
@@ -73,7 +73,6 @@ class HMVC_Router extends CI_Router {
 
         $this->config->set_item('modules_locations', $locations);
 
-
         parent::__construct();
     }
 
@@ -83,9 +82,10 @@ class HMVC_Router extends CI_Router {
      *
      * @access	private
      * @param	array
-     * @return	array
+     * @return array
      */
-    function _validate_request($segments) {
+    public function _validate_request($segments)
+    {
         if (count($segments) == 0) {
             return $segments;
         }
@@ -119,9 +119,10 @@ class HMVC_Router extends CI_Router {
      * the current module in this method.
      *
      * @access	private
-     * @return	void
+     * @return void
      */
-    function _parse_routes() {
+    public function _parse_routes()
+    {
         // Apply the current module's routing config
 
         // CI v3.x has URI starting at segment 1
@@ -147,11 +148,12 @@ class HMVC_Router extends CI_Router {
      * The logic of locating a controller is grouped in this function
      *
      * @param	array
-     * @return	array
+     * @return array
      */
-    function locate($segments) {
+    public function locate($segments)
+    {
         // anon function to ucfirst a string if CI ver > 2 (for backwards compatibility)
-        $_ucfirst = function($cn) {return (intval(substr(CI_VERSION,0,1)) > 2) ? ucfirst($cn) : $cn;};
+        $_ucfirst = function ($cn) {return (intval(substr(CI_VERSION,0,1)) > 2) ? ucfirst($cn) : $cn;};
 
         list($module, $directory, $controller) = array_pad($segments, 3, NULL);
 
@@ -180,6 +182,7 @@ class HMVC_Router extends CI_Router {
                 // Module root controller?
                 if ($directory && is_file($source . $_ucfirst($directory) . '.php')) {
                     $this->class = $directory;
+
                     return array_slice($segments, 1);
                 }
 
@@ -196,6 +199,7 @@ class HMVC_Router extends CI_Router {
                     // Module sub-directory  default controller?
                     if (is_file($source . $_ucfirst($this->default_controller) . '.php')) {
                         $segments[1] = $this->default_controller;
+
                         return array_slice($segments, 1);
                     }
 
@@ -213,6 +217,7 @@ class HMVC_Router extends CI_Router {
                 // Module default controller?
                 if (is_file($source . $_ucfirst($this->default_controller) . '.php')) {
                     $segments[0] = $this->default_controller;
+
                     return $segments;
                 }
             }
@@ -226,12 +231,14 @@ class HMVC_Router extends CI_Router {
         // Sub-directory controller?
         if ($directory && is_file(APPPATH . 'controllers/' . $module . '/' . $_ucfirst($directory) . '.php')) {
             $this->directory = $module . '/';
+
             return array_slice($segments, 1);
         }
 
         // Default controller?
         if (is_file(APPPATH . 'controllers/' . $module . '/' . $_ucfirst($this->default_controller) . '.php')) {
             $segments[0] = $this->default_controller;
+
             return $segments;
         }
     }
@@ -240,9 +247,10 @@ class HMVC_Router extends CI_Router {
      * Set the module name
      *
      * @param	string
-     * @return	void
+     * @return void
      */
-    function set_module($module) {
+    public function set_module($module)
+    {
         $this->module = $module;
     }
 
@@ -253,7 +261,7 @@ class HMVC_Router extends CI_Router {
      * then in Modules named after the default_controller
      * @author  hArpanet - based on system/core/Router.php
      *
-     * @return  void
+     * @return void
      */
     public function _set_default_controller()
     {
@@ -267,8 +275,7 @@ class HMVC_Router extends CI_Router {
 
             // no 'normal' controller found,
             // get the class/method from the default_controller route
-            if (sscanf($this->default_controller, '%[^/]/%s', $class, $method) !== 2)
-            {
+            if (sscanf($this->default_controller, '%[^/]/%s', $class, $method) !== 2) {
                 $method = 'index';
             }
 
@@ -284,14 +291,14 @@ class HMVC_Router extends CI_Router {
 
     // --------------------------------------------------------------------
 
-
     /**
      * Fetch the module
      *
      * @access	public
-     * @return	string
+     * @return string
      */
-    function fetch_module() {
+    public function fetch_module()
+    {
         return $this->module;
     }
 }
